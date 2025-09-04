@@ -8,8 +8,13 @@ import { Typography } from '@alfalab/core-components/typography';
 import { ArrowRightMIcon } from '@alfalab/icons-glyph/ArrowRightMIcon';
 import { InformationCircleLineSIcon } from '@alfalab/icons-glyph/InformationCircleLineSIcon';
 import { useState } from 'react';
+import moneyImg from '../assets/money.png';
+import oneImg from '../assets/one.png';
 import rubIcon from '../assets/rub.png';
+import threeImg from '../assets/three.png';
+import twoImg from '../assets/two.png';
 import { STOCK_WORDS } from '../constants';
+import { LS, LSKeys } from '../ls';
 import { StockItem } from '../types';
 import { sendDataToGA } from '../utils/events';
 import { formatWord } from '../utils/words';
@@ -24,6 +29,7 @@ export const BuyScreen = ({ stockItem, setThx }: Props) => {
   const [lots, setLots] = useState(0);
   const [showBs, setShowBs] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   const submit = () => {
     if (lots === 0) {
@@ -34,7 +40,7 @@ export const BuyScreen = ({ stockItem, setThx }: Props) => {
       sum: stockItem.price_today * lots * stockItem.lot,
       active: stockItem.ticker,
     }).then(() => {
-      // LS.setItem(LSKeys.ShowThx, true);
+      LS.setItem(LSKeys.ShowThx, true);
       setThx(true);
       setLoading(false);
     });
@@ -102,6 +108,30 @@ export const BuyScreen = ({ stockItem, setThx }: Props) => {
             size={48}
             hint={`1 лот = ${formatWord(stockItem.lot, STOCK_WORDS)}`}
             pattern="[0-9]*"
+          />
+        </div>
+
+        <div
+          className={bsSt.informerGreen}
+          onClick={() => {
+            window.gtag('event', '6273_informer_active', {
+              var: 'var3',
+              ticker: stockItem.ticker,
+            });
+            setShowInfo(true);
+          }}
+        >
+          <Typography.Text view="secondary-medium" tag="p" defaultMargins={false}>
+            Собери <b>35</b> из <b>45</b> активов от 1000 ₽ и получи шанс на главный приз в <b>1 000 000 ₽</b>
+          </Typography.Text>
+          <img
+            src={moneyImg}
+            width={103}
+            height={103}
+            alt="money"
+            style={{
+              margin: '-30px 0 -14px',
+            }}
           />
         </div>
       </div>
@@ -178,6 +208,60 @@ export const BuyScreen = ({ stockItem, setThx }: Props) => {
             Комиссия зависит от вашего тарифа. Подробнее узнать о тарифах вы можете в разделе Инвестиции. Проверить или
             сменить ваш тариф можно в приложении Альфа-Инвестиции: Ещё → Личный кабинет → Тарифы
           </Typography.Text>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet
+        open={showInfo}
+        onClose={() => {
+          setShowInfo(false);
+        }}
+        contentClassName={bsSt.btmContent}
+        title="Как тут всё устроено"
+        hasCloser
+        stickyHeader
+        actionButton={
+          <ButtonMobile view="primary" onClick={() => setShowInfo(false)} block>
+            Понятно
+          </ButtonMobile>
+        }
+      >
+        <div className={bsSt.container} style={{ padding: '1rem' }}>
+          <div className={bsSt.greyBox}>
+            <img src={oneImg} alt="one" width={32} height={32} />
+            <div>
+              <Typography.TitleResponsive font="system" tag="h2" view="xsmall" weight="bold" style={{ marginBottom: '8px' }}>
+                Покупайте акции и открывайте карту
+              </Typography.TitleResponsive>
+              <Typography.Text view="primary-small" tag="p" defaultMargins={false}>
+                Нажимайте на ячейки компаний на карте и покупайте акции. После покупки участок карты станет цветным
+              </Typography.Text>
+            </div>
+          </div>
+          <div className={bsSt.greyBox}>
+            <img src={twoImg} alt="two" width={32} height={32} />
+            <div>
+              <Typography.TitleResponsive font="system" tag="h2" view="xsmall" weight="bold" style={{ marginBottom: '8px' }}>
+                Получайте шансы и выигрывайте призы
+              </Typography.TitleResponsive>
+              <Typography.Text view="primary-small" tag="p" defaultMargins={false}>
+                Каждый день совершайте сделки с акциями любых компаний на сумму от 1000 ₽ и получайте шансы на победу в
+                ежемесячном розыгрыше
+              </Typography.Text>
+            </div>
+          </div>
+          <div className={bsSt.greyBox}>
+            <img src={threeImg} alt="three" width={32} height={32} />
+            <div>
+              <Typography.TitleResponsive font="system" tag="h2" view="xsmall" weight="bold" style={{ marginBottom: '8px' }}>
+                Участвуйте в главном розыгрыше
+              </Typography.TitleResponsive>
+              <Typography.Text view="primary-small" tag="p" defaultMargins={false}>
+                Откройте карту на 35/45 и больше и получите шанс выиграть акции на сумму 1 000 000 ₽! Победителя выберем
+                случайным образом
+              </Typography.Text>
+            </div>
+          </div>
         </div>
       </BottomSheet>
     </>
